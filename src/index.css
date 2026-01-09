@@ -1,0 +1,13 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  @apply bg-gray-950 text-white min-h-screen;
+}
+
+@layer utilities {
+  .text-gradient {
+    @apply bg-gradient-to-r from-flame-orange via-flame-red to-flame-yellow bg-clip-text text-transparent;
+  }
+}

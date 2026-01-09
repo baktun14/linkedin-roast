@@ -1,0 +1,26 @@
+{
+  "permissions": {
+    "allow": [
+      "WebSearch",
+      "WebFetch(domain:akashml.com)",
+      "WebFetch(domain:api-docs.deepseek.com)",
+      "WebFetch(domain:docs.akash.network)",
+      "WebFetch(domain:akash.network)",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:chatapi.akash.network)",
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "Bash(bun create:*)",
+      "Bash(bun install)",
+      "Bash(bun run build:*)",
+      "Bash(bun run dev)",
+      "Bash(bun add:*)",
+      "Bash(bun run dev:server)",
+      "Bash(bun run dev:frontend:*)",
+      "Bash(lsof:*)",
+      "Bash(bun:*)",
+      "Bash(curl:*)",
+      "Bash(pkill:*)",
+      "WebFetch(domain:playground.akashml.com)"
+    ]
+  }
+}
