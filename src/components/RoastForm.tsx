@@ -9,16 +9,27 @@ interface RoastFormProps {
   isParsingPDF: boolean;
 }
 
-const PLACEHOLDER_TEXT = `Paste your LinkedIn profile content here. You can copy from:
-- The PDF you downloaded
-- Your LinkedIn "About" section
-- Any text from your profile page`;
+// Detect if user is on mobile device
+function isMobileDevice(): boolean {
+  if (typeof window === 'undefined') return false;
+  return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
+    window.innerWidth < 768;
+}
+
+const PLACEHOLDER_TEXT = `Paste your LinkedIn profile here:
+
+• Your name and headline
+• About/Summary section
+• Job titles and companies
+• Skills
+
+The more you include, the better the roast!`;
 
 const MIN_TEXT_CHARS = 50;
 const MAX_TEXT_CHARS = 3000;
 
 export function RoastForm({ onSubmitPDF, onSubmitText, isLoading, isParsingPDF }: RoastFormProps) {
-  const [mode, setMode] = useState<InputMode>('pdf');
+  const [mode, setMode] = useState<InputMode>(() => isMobileDevice() ? 'text' : 'pdf');
   const [pdfFile, setPdfFile] = useState<File | null>(null);
   const [text, setText] = useState('');
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -162,7 +173,20 @@ export function RoastForm({ onSubmitPDF, onSubmitText, isLoading, isParsingPDF }
 
       {/* Text Input Mode */}
       {mode === 'text' && (
-        <div className="relative">
+        <div>
+          {/* Mobile Instructions */}
+          <div className="mb-4 p-4 bg-gray-900/50 border border-gray-800 rounded-lg">
+            <h3 className="text-sm font-semibold text-gray-300 mb-2">On mobile? Here's how to copy your profile:</h3>
+            <ol className="text-sm text-gray-500 space-y-1">
+              <li>1. Open LinkedIn app and go to your profile</li>
+              <li>2. Copy your <span className="text-gray-300">name</span> and <span className="text-gray-300">headline</span></li>
+              <li>3. Tap <span className="text-gray-300">"About"</span> → Select all → Copy</li>
+              <li>4. Copy your <span className="text-gray-300">job titles</span> and <span className="text-gray-300">companies</span></li>
+              <li>5. Paste everything below!</li>
+            </ol>
+          </div>
+
+          <div className="relative">
           <textarea
             value={text}
             onChange={(e) => setText(e.target.value)}
@@ -182,6 +206,7 @@ export function RoastForm({ onSubmitPDF, onSubmitText, isLoading, isParsingPDF }
               Need at least {MIN_TEXT_CHARS - textCharCount} more characters
             </p>
           )}
+          </div>
         </div>
       )}
 
@@ -209,7 +234,7 @@ export function RoastForm({ onSubmitPDF, onSubmitText, isLoading, isParsingPDF }
       {/* Mode hint */}
       {mode === 'pdf' && (
         <p className="mt-4 text-center text-sm text-gray-500">
-          Don't have the PDF?{' '}
+          On mobile or don't have the PDF?{' '}
           <button
             type="button"
             onClick={() => setMode('text')}
