@@ -20,7 +20,9 @@
       "Bash(bun:*)",
       "Bash(curl:*)",
       "Bash(pkill:*)",
-      "WebFetch(domain:playground.akashml.com)"
+      "WebFetch(domain:playground.akashml.com)",
+      "Bash(bunx vite:*)",
+      "WebFetch(domain:docs.together.ai)"
     ]
   }
 }

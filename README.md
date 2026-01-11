@@ -65,6 +65,25 @@ Deploy this app on the decentralized Akash Network:
 4. Set your `VITE_AKASHML_API_KEY` environment variable
 5. Deploy!
 
+## CI/CD
+
+This project includes GitHub Actions for automated Docker builds and optional Akash deployments.
+
+| Workflow | Trigger | Purpose |
+|----------|---------|---------|
+| **Build Docker Image** | Push to `master` | Builds and pushes to ghcr.io |
+| **Deploy to Akash** | Manual | Creates/updates Akash deployment |
+
+> **Note**: Akash Console's "Build and Deploy" already auto-deploys on code changes. The manual deploy workflow is provided as an example for explicit CI/CD control.
+
+**Quick setup:**
+1. Add `AKASH_CONSOLE_API_KEY` secret (from [console.akash.network](https://console.akash.network) → Settings → API Keys)
+2. Add `VITE_AKASHML_API_KEY` secret
+3. Push to `master` to trigger Docker build
+4. (Optional) Run "Deploy to Akash" workflow manually
+
+See [docs/CICD.md](docs/CICD.md) for detailed setup instructions.
+
 ## Tech Stack
 
 - **Runtime**: [Bun](https://bun.sh/)
@@ -73,6 +92,7 @@ Deploy this app on the decentralized Akash Network:
 - **AI**: [AkashML](https://akashml.com) (DeepSeek-V3)
 - **PDF Parsing**: [pdf-parse](https://www.npmjs.com/package/pdf-parse)
 - **Deployment**: [Akash Network](https://akash.network)
+- **CI/CD**: [GitHub Actions](https://github.com/features/actions)
 
 ## How It Works
 
@@ -86,6 +106,14 @@ Deploy this app on the decentralized Akash Network:
 
 ```
 linkedin-roast/
+├── .github/
+│   └── workflows/
+│       ├── build-image.yml    # Docker build (auto on push to master)
+│       └── deploy-akash.yml   # Akash deploy (manual)
+├── docs/
+│   ├── CICD.md                # CI/CD documentation
+│   ├── linkedin-roast-tutorial.md  # Tutorial for docs.akash.network
+│   └── twitter-thread.md      # Marketing thread
 ├── src/
 │   ├── components/
 │   │   ├── RoastForm.tsx      # PDF upload & text input
@@ -103,6 +131,7 @@ linkedin-roast/
 │   ├── App.tsx
 │   └── main.tsx
 ├── api-server.ts              # Backend API server
+├── Dockerfile                 # Multi-stage Docker build
 ├── deploy.yaml                # Akash SDL deployment file
 └── package.json
 ```

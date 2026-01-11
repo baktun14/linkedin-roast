@@ -1,0 +1,152 @@
+name: Deploy to Akash
+
+on:
+  # Manual trigger only - Akash Console auto-deploys on code changes
+  workflow_dispatch:
+    inputs:
+      force_new_deployment:
+        description: 'Force new deployment (ignore existing DSEQ)'
+        required: false
+        type: boolean
+        default: false
+
+env:
+  AKASH_API_URL: https://console-api.akash.network
+
+jobs:
+  build:
+    uses: ./.github/workflows/build-image.yml
+    with:
+      tag: ${{ github.sha }}
+    permissions:
+      contents: read
+      packages: write
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Prepare SDL
+        run: |
+          # Replace image placeholder with actual image
+          sed -i "s|image:.*|image: ghcr.io/${{ github.repository }}:sha-${GITHUB_SHA::7}|" deploy.yaml
+          echo "Updated deploy.yaml:"
+          cat deploy.yaml
+
+      - name: Check existing deployment
+        id: check
+        run: |
+          if [ -n "${{ secrets.AKASH_DSEQ }}" ] && [ "${{ inputs.force_new_deployment }}" != "true" ]; then
+            echo "has_deployment=true" >> $GITHUB_OUTPUT
+            echo "dseq=${{ secrets.AKASH_DSEQ }}" >> $GITHUB_OUTPUT
+            echo "Found existing deployment: DSEQ ${{ secrets.AKASH_DSEQ }}"
+          else
+            echo "has_deployment=false" >> $GITHUB_OUTPUT
+            echo "No existing deployment found, will create new one"
+          fi
+
+      - name: Update existing deployment
+        if: steps.check.outputs.has_deployment == 'true'
+        run: |
+          SDL_CONTENT=$(cat deploy.yaml)
+
+          echo "Updating deployment DSEQ ${{ steps.check.outputs.dseq }}..."
+
+          curl -X PUT "${{ env.AKASH_API_URL }}/v1/deployments/${{ steps.check.outputs.dseq }}" \
+            -H "Content-Type: application/json" \
+            -H "x-api-key: ${{ secrets.AKASH_CONSOLE_API_KEY }}" \
+            -d "{\"data\": {\"sdl\": $(echo "$SDL_CONTENT" | jq -Rs .)}}" \
+            --fail-with-body
+
+          echo ""
+          echo "✅ Deployment updated: DSEQ ${{ steps.check.outputs.dseq }}"
+
+      - name: Create new deployment
+        if: steps.check.outputs.has_deployment == 'false'
+        id: create
+        run: |
+          SDL_CONTENT=$(cat deploy.yaml)
+
+          echo "Creating new deployment..."
+
+          RESPONSE=$(curl -X POST "${{ env.AKASH_API_URL }}/v1/deployments" \
+            -H "Content-Type: application/json" \
+            -H "x-api-key: ${{ secrets.AKASH_CONSOLE_API_KEY }}" \
+            -d "{\"data\": {\"sdl\": $(echo "$SDL_CONTENT" | jq -Rs .), \"deposit\": 5}}" \
+            --fail-with-body)
+
+          DSEQ=$(echo "$RESPONSE" | jq -r '.dseq')
+          MANIFEST=$(echo "$RESPONSE" | jq -r '.manifest')
+
+          echo "dseq=$DSEQ" >> $GITHUB_OUTPUT
+          echo "$MANIFEST" > manifest.json
+
+          echo ""
+          echo "🆕 Created deployment: DSEQ $DSEQ"
+
+      - name: Wait for bids
+        if: steps.check.outputs.has_deployment == 'false'
+        run: |
+          DSEQ=${{ steps.create.outputs.dseq }}
+
+          echo "Waiting for provider bids..."
+
+          for i in {1..12}; do
+            echo "Polling for bids (attempt $i/12)..."
+
+            BIDS=$(curl -s "${{ env.AKASH_API_URL }}/v1/bids?dseq=$DSEQ" \
+              -H "x-api-key: ${{ secrets.AKASH_CONSOLE_API_KEY }}")
+
+            BID_COUNT=$(echo "$BIDS" | jq 'length')
+
+            if [ "$BID_COUNT" -gt 0 ]; then
+              echo "✅ Received $BID_COUNT bid(s)"
+              echo "$BIDS" | jq '.[0]' > selected_bid.json
+              echo "Selected bid:"
+              cat selected_bid.json
+              break
+            fi
+
+            sleep 5
+          done
+
+          if [ ! -f selected_bid.json ]; then
+            echo "❌ No bids received after 60 seconds"
+            exit 1
+          fi
+
+      - name: Accept bid and create lease
+        if: steps.check.outputs.has_deployment == 'false'
+        run: |
+          DSEQ=${{ steps.create.outputs.dseq }}
+          PROVIDER=$(cat selected_bid.json | jq -r '.provider')
+          MANIFEST=$(cat manifest.json)
+
+          echo "Accepting bid from provider: $PROVIDER"
+
+          curl -X POST "${{ env.AKASH_API_URL }}/v1/leases" \
+            -H "Content-Type: application/json" \
+            -H "x-api-key: ${{ secrets.AKASH_CONSOLE_API_KEY }}" \
+            -d "{
+              \"manifest\": $MANIFEST,
+              \"leases\": [{
+                \"dseq\": \"$DSEQ\",
+                \"gseq\": 1,
+                \"oseq\": 1,
+                \"provider\": \"$PROVIDER\"
+              }]
+            }" \
+            --fail-with-body
+
+          echo ""
+          echo "✅ Lease created with provider $PROVIDER"
+          echo ""
+          echo "========================================"
+          echo "📋 IMPORTANT: Add this secret to your repository:"
+          echo ""
+          echo "   AKASH_DSEQ=$DSEQ"
+          echo ""
+          echo "Go to: Settings → Secrets and variables → Actions → New repository secret"
+          echo "========================================"

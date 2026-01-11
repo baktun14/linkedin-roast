@@ -3,11 +3,12 @@ version: "2.0"
 
 services:
   web:
-    image: ghcr.io/akash-network/awesome-akash:react-vite
+    # Image tag is updated by CI/CD workflow on each build
+    image: ghcr.io/akash-network/linkedin-roast:sha-0000000
     env:
-      - VITE_AKASHML_API_KEY=<your-api-key>
+      - VITE_AKASHML_API_KEY=${VITE_AKASHML_API_KEY}
     expose:
-      - port: 80
+      - port: 3000
         as: 80
         to:
           - global: true
