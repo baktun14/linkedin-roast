@@ -3,7 +3,7 @@ WORKDIR /app
 ENV NODE_ENV=production
 
 FROM base AS builder
-COPY package.json bun.lockb ./
+COPY package.json bun.lock ./
 RUN bun install --frozen-lockfile
 COPY . .
 RUN bun run build

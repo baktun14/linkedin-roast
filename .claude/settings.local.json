@@ -22,7 +22,8 @@
       "Bash(pkill:*)",
       "WebFetch(domain:playground.akashml.com)",
       "Bash(bunx vite:*)",
-      "WebFetch(domain:docs.together.ai)"
+      "WebFetch(domain:docs.together.ai)",
+      "Bash(ls:*)"
     ]
   }
 }
