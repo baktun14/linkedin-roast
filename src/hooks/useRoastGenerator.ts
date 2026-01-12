@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { generateRoast, type RoastResult } from '../services/roastService';
+import { generateRoast } from '../services/roastService';
 import { parseLinkedInPDF } from '../services/linkedinService';
 import type { LinkedInProfile } from '../types/linkedin';
 
