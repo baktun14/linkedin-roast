@@ -34,14 +34,18 @@ bun install
 cp .env.example .env
 # Edit .env and add your AkashML API key
 
-# Start the API server (in one terminal)
-bun run api-server.ts
-
-# Start the frontend (in another terminal)
+# Start development server (frontend + backend)
 bun run dev
 ```
 
-Open [http://localhost:5173](http://localhost:5173) in your browser.
+Open [http://localhost:3000](http://localhost:3000) in your browser.
+
+### Production Build
+
+```bash
+# Build and start production server
+bun run start
+```
 
 ## Environment Variables
 
@@ -108,33 +112,52 @@ See [docs/CICD.md](docs/CICD.md) for detailed setup instructions.
 linkedin-roast/
 ├── .github/
 │   └── workflows/
-│       ├── build-image.yml    # Docker build (auto on push to master)
-│       └── deploy-akash.yml   # Akash deploy (manual)
+│       ├── build-image.yml       # Docker build (auto on push to master)
+│       └── deploy-akash.yml      # Akash deploy (manual)
 ├── docs/
-│   ├── CICD.md                # CI/CD documentation
-│   ├── linkedin-roast-tutorial.md  # Tutorial for docs.akash.network
-│   └── twitter-thread.md      # Marketing thread
-├── src/
+│   └── CICD.md                   # CI/CD documentation
+├── server/                       # Backend server (modular architecture)
+│   ├── index.ts                  # Server entry point
+│   ├── config.ts                 # Configuration
+│   ├── types.ts                  # TypeScript types
+│   ├── routes/
+│   │   ├── index.ts              # Route matcher
+│   │   ├── pdf.ts                # POST /api/parse-pdf
+│   │   └── roast.ts              # POST /api/roast
+│   └── services/
+│       ├── ai.ts                 # AkashML API integration
+│       └── pdf.ts                # PDF parsing service
+├── src/                          # Frontend React app
 │   ├── components/
-│   │   ├── RoastForm.tsx      # PDF upload & text input
-│   │   ├── RoastDisplay.tsx   # Shows the roast result
-│   │   └── ShareButtons.tsx   # Share to X, Copy
+│   │   ├── RoastForm.tsx         # PDF upload & text input
+│   │   ├── RoastDisplay.tsx      # Shows the roast result
+│   │   └── ShareButtons.tsx      # Share to X, Copy
 │   ├── hooks/
-│   │   └── useRoastGenerator.ts
+│   │   └── useRoastGenerator.ts  # React hook for roast logic
 │   ├── services/
-│   │   ├── roastService.ts    # Roast generation API
-│   │   └── linkedinService.ts # PDF parsing API
+│   │   ├── roastService.ts       # Roast generation API client
+│   │   └── linkedinService.ts    # PDF parsing API client
 │   ├── utils/
-│   │   └── shareUtils.ts      # Twitter sharing
+│   │   └── shareUtils.ts         # Twitter sharing utilities
 │   ├── types/
-│   │   └── linkedin.ts        # TypeScript types
+│   │   └── linkedin.ts           # TypeScript types
 │   ├── App.tsx
 │   └── main.tsx
-├── api-server.ts              # Backend API server
-├── Dockerfile                 # Multi-stage Docker build
-├── deploy.yaml                # Akash SDL deployment file
+├── Dockerfile                    # Multi-stage Docker build
+├── deploy.yaml                   # Akash SDL deployment file
+├── vite.config.ts                # Vite configuration
 └── package.json
 ```
+
+## Scripts
+
+| Script | Description |
+|--------|-------------|
+| `bun run dev` | Start development server (frontend + backend) |
+| `bun run dev:frontend` | Start Vite dev server only |
+| `bun run dev:server` | Start backend server only |
+| `bun run build` | Build for production |
+| `bun run start` | Start production server |
 
 ## Links
 

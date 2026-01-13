@@ -23,7 +23,9 @@
       "WebFetch(domain:playground.akashml.com)",
       "Bash(bunx vite:*)",
       "WebFetch(domain:docs.together.ai)",
-      "Bash(ls:*)"
+      "Bash(ls:*)",
+      "Bash(git -C /Users/baktun14/repos/claude/linkedin-roast status)",
+      "Bash(git -C /Users/baktun14/repos/claude/linkedin-roast status --short)"
     ]
   }
 }

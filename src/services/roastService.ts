@@ -1,8 +1,6 @@
 import type { LinkedInProfile } from '../types/linkedin';
 
-const API_URL = import.meta.env.DEV
-  ? 'http://localhost:8787/api/roast'
-  : '/api/roast';
+const API_URL = '/api/roast';
 
 interface RoastResponse {
   roast?: string;

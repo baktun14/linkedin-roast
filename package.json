@@ -4,12 +4,12 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "dev": "echo 'Run both: bun run dev:api & bun run dev:frontend'",
+    "dev": "concurrently \"bun run dev:frontend\" \"bun run dev:server\"",
     "dev:frontend": "vite",
-    "dev:api": "bun run --watch api-server.ts",
+    "dev:server": "NODE_ENV=development PORT=8787 bun run --watch server/index.ts",
     "build": "tsc -b && vite build",
     "preview": "vite preview",
-    "start": "bun run server.ts"
+    "start": "bun run server/index.ts"
   },
   "dependencies": {
     "pdf-parse": "1.1.1",
@@ -22,6 +22,7 @@
     "@types/react-dom": "^18.3.0",
     "@vitejs/plugin-react": "^4.3.1",
     "autoprefixer": "^10.4.19",
+    "concurrently": "^9.1.2",
     "postcss": "^8.4.38",
     "tailwindcss": "^3.4.4",
     "typescript": "^5.5.3",

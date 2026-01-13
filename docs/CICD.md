@@ -153,7 +153,7 @@ Open [http://localhost:3000](http://localhost:3000)
 
 ### Docker build fails
 
-1. Check that `bun.lockb` exists (run `bun install` locally first)
+1. Check that `bun.lock` exists (run `bun install` locally first)
 2. Ensure all required files are not in `.dockerignore`
 
 ### No bids received

@@ -1,8 +1,6 @@
 import type { LinkedInProfile } from '../types/linkedin';
 
-const API_URL = import.meta.env.DEV
-  ? 'http://localhost:8787/api/parse-pdf'
-  : '/api/parse-pdf';
+const API_URL = '/api/parse-pdf';
 
 interface LinkedInResponse {
   profile?: LinkedInProfile;
