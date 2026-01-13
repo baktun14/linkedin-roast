@@ -4,7 +4,7 @@ version: "2.0"
 services:
   web:
     # Image tag is updated by CI/CD workflow on each build
-    image: ghcr.io/akash-network/linkedin-roast:sha-0000000
+    image: ghcr.io/baktun14/linkedin-roast:sha-0000000
     env:
       - VITE_AKASHML_API_KEY=${VITE_AKASHML_API_KEY}
     expose:
