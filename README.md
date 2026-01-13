@@ -34,18 +34,11 @@ bun install
 cp .env.example .env
 # Edit .env and add your AkashML API key
 
-# Start development server (frontend + backend)
-bun run dev
+# Start development server (frontend only - fully client-side)
+bun run dev:frontend
 ```
 
 Open [http://localhost:3000](http://localhost:3000) in your browser.
-
-### Production Build
-
-```bash
-# Build and start production server
-bun run start
-```
 
 ## Environment Variables
 
@@ -61,30 +54,36 @@ Get your API key at [akashml.com](https://akashml.com)
 
 [![Deploy on Akash](https://img.shields.io/badge/Deploy%20on-Akash-red?style=for-the-badge&logo=data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cGF0aCBkPSJNMTIgMkwyIDdsMTAgNSAxMC01LTEwLTV6TTIgMTdsMTAgNSAxMC01TTIgMTJsMTAgNSAxMC01IiBzdHJva2U9IndoaXRlIiBzdHJva2Utd2lkdGg9IjIiIGZpbGw9Im5vbmUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIvPjwvc3ZnPg==)](https://console.akash.network)
 
-Deploy this app on the decentralized Akash Network:
+### Option 1: Build and Deploy (Recommended)
+
+The easiest way to deploy - works as a fully client-side static app:
 
 1. Go to [Akash Console](https://console.akash.network)
-2. Create a new deployment
-3. Use the SDL file from `deploy.yaml`
+2. Click **"Build and Deploy"**
+3. Connect your GitHub repo
+4. Set the environment variable: `VITE_AKASHML_API_KEY`
+5. Deploy!
+
+The app runs entirely in the browser - PDF parsing and AI calls happen client-side.
+
+### Option 2: Docker Deployment
+
+For more control, deploy using the Docker image:
+
+1. Go to [Akash Console](https://console.akash.network)
+2. Create a new deployment with **"Deploy with SDL"**
+3. Use the SDL from `deploy.yaml` (update the image tag)
 4. Set your `VITE_AKASHML_API_KEY` environment variable
 5. Deploy!
 
 ## CI/CD
 
-This project includes GitHub Actions for automated Docker builds and optional Akash deployments.
+This project includes GitHub Actions for automated Docker builds.
 
 | Workflow | Trigger | Purpose |
 |----------|---------|---------|
 | **Build Docker Image** | Push to `master` | Builds and pushes to ghcr.io |
 | **Deploy to Akash** | Manual | Creates/updates Akash deployment |
-
-> **Note**: Akash Console's "Build and Deploy" already auto-deploys on code changes. The manual deploy workflow is provided as an example for explicit CI/CD control.
-
-**Quick setup:**
-1. Add `AKASH_CONSOLE_API_KEY` secret (from [console.akash.network](https://console.akash.network) → Settings → API Keys)
-2. Add `VITE_AKASHML_API_KEY` secret
-3. Push to `master` to trigger Docker build
-4. (Optional) Run "Deploy to Akash" workflow manually
 
 See [docs/CICD.md](docs/CICD.md) for detailed setup instructions.
 
@@ -94,17 +93,16 @@ See [docs/CICD.md](docs/CICD.md) for detailed setup instructions.
 - **Frontend**: [React](https://react.dev/) + [TypeScript](https://www.typescriptlang.org/) + [Vite](https://vitejs.dev/)
 - **Styling**: [Tailwind CSS](https://tailwindcss.com/)
 - **AI**: [AkashML](https://akashml.com) (DeepSeek-V3)
-- **PDF Parsing**: [pdf-parse](https://www.npmjs.com/package/pdf-parse)
+- **PDF Parsing**: [pdf.js](https://mozilla.github.io/pdf.js/) (client-side)
 - **Deployment**: [Akash Network](https://akash.network)
-- **CI/CD**: [GitHub Actions](https://github.com/features/actions)
 
 ## How It Works
 
 1. **Upload PDF**: User uploads their LinkedIn PDF (Profile → More → Save to PDF)
-2. **Extract Text**: pdf-parse extracts text from the PDF
-3. **AI Extraction**: AkashML/DeepSeek extracts structured profile data (name, headline, experience, skills, LinkedIn URL)
+2. **Extract Text**: pdf.js extracts text from the PDF in the browser
+3. **AI Extraction**: AkashML/DeepSeek extracts structured profile data (name, headline, experience, skills)
 4. **Generate Roast**: AI creates a personalized, savage roast under 280 characters
-5. **Share**: User can share on X or copy the roast with their name and LinkedIn URL
+5. **Share**: User can share on X or copy the roast
 
 ## Project Structure
 
@@ -116,31 +114,18 @@ linkedin-roast/
 │       └── deploy-akash.yml      # Akash deploy (manual)
 ├── docs/
 │   └── CICD.md                   # CI/CD documentation
-├── server/                       # Backend server (modular architecture)
+├── server/                       # Backend server (for Docker deployment)
 │   ├── index.ts                  # Server entry point
 │   ├── config.ts                 # Configuration
 │   ├── types.ts                  # TypeScript types
-│   ├── routes/
-│   │   ├── index.ts              # Route matcher
-│   │   ├── pdf.ts                # POST /api/parse-pdf
-│   │   └── roast.ts              # POST /api/roast
-│   └── services/
-│       ├── ai.ts                 # AkashML API integration
-│       └── pdf.ts                # PDF parsing service
+│   ├── routes/                   # API route handlers
+│   └── services/                 # Business logic
 ├── src/                          # Frontend React app
-│   ├── components/
-│   │   ├── RoastForm.tsx         # PDF upload & text input
-│   │   ├── RoastDisplay.tsx      # Shows the roast result
-│   │   └── ShareButtons.tsx      # Share to X, Copy
-│   ├── hooks/
-│   │   └── useRoastGenerator.ts  # React hook for roast logic
-│   ├── services/
-│   │   ├── roastService.ts       # Roast generation API client
-│   │   └── linkedinService.ts    # PDF parsing API client
-│   ├── utils/
-│   │   └── shareUtils.ts         # Twitter sharing utilities
-│   ├── types/
-│   │   └── linkedin.ts           # TypeScript types
+│   ├── components/               # React components
+│   ├── hooks/                    # React hooks
+│   ├── services/                 # API clients (client-side)
+│   ├── utils/                    # Utility functions
+│   ├── types/                    # TypeScript types
 │   ├── App.tsx
 │   └── main.tsx
 ├── Dockerfile                    # Multi-stage Docker build
@@ -153,11 +138,10 @@ linkedin-roast/
 
 | Script | Description |
 |--------|-------------|
-| `bun run dev` | Start development server (frontend + backend) |
-| `bun run dev:frontend` | Start Vite dev server only |
-| `bun run dev:server` | Start backend server only |
+| `bun run dev:frontend` | Start Vite dev server (client-side only) |
+| `bun run dev` | Start frontend + backend for development |
 | `bun run build` | Build for production |
-| `bun run start` | Start production server |
+| `bun run start` | Start production server (Docker deployment) |
 
 ## Links
 
