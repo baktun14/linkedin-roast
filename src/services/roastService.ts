@@ -18,13 +18,10 @@ function generateRoastPrompt(profile?: LinkedInProfile, bioText?: string): strin
       profile.skills.length && `Skills they're proud of: ${profile.skills.join(', ')}`,
     ].filter(Boolean);
 
-    return (
-      parts.join('\n') +
-      '\n\nCreate a brutal but clever roast under 280 characters. Start with their name for personalization. Mock the corporate jargon, not the person.'
-    );
+    return parts.join('\n');
   }
 
-  return `Roast this LinkedIn bio:\n\n${bioText}\n\nCreate a brutal but clever roast under 280 characters. Mock the corporate jargon, not the person.`;
+  return `Roast this LinkedIn bio:\n\n${bioText}`;
 }
 
 export async function generateRoast(options: {
@@ -54,37 +51,23 @@ export async function generateRoast(options: {
       messages: [
         {
           role: 'system',
-          content: `You are a professional comedy roast writer specializing in LinkedIn profiles. Your job is to create brutally funny, clever roasts that poke fun at corporate jargon, inflated titles, buzzword-heavy descriptions, and the general absurdity of professional self-promotion on LinkedIn.
+          content: `You write brutal LinkedIn roasts. Rules:
+1. Aim for 200-240 characters (for Twitter, max 280) - THIS IS THE MOST IMPORTANT RULE
+2. NO intro like "Here's a roast" - just the roast itself
+3. Write in 3rd person using their name (never "you" or "this guy")
+4. Mock corporate jargon, buzzwords, inflated titles
+5. Be savage but clever, like a Comedy Central roast
+6. One punchy line or two, end with a mic-drop
 
-STYLE GUIDELINES:
-- Be savage but not mean-spirited (punch up at corporate culture, not down at the person)
-- Reference specific details from their profile to make it personal
-- Mock buzzwords like "synergy," "thought leader," "passionate," "ninja," "rockstar"
-- Call out humble-brags and virtue signaling
-- Poke fun at vague accomplishments and inflated job titles
-- Keep it under 280 characters so it fits in a tweet (CRITICAL!)
-- Use witty observations, not crude insults
-- Channel the energy of a Comedy Central Roast
-
-TONE:
-- Playfully brutal, like a roast between friends
-- Self-aware about LinkedIn culture
-- Clever wordplay over cheap shots
-- The person should laugh at themselves, not feel attacked
-
-FORMAT:
-- One punchy paragraph, no introduction or explanation
-- If given a name, start with their name for personalization
-- End with a mic-drop line if possible
-- MUST be under 280 characters`,
+Output ONLY the roast text, nothing else.`,
         },
         {
           role: 'user',
           content: prompt,
         },
       ],
-      temperature: 0.9,
-      max_tokens: 300,
+      temperature: 0.8,
+      max_tokens: 100,
     }),
   });
 

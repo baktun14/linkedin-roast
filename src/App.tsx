@@ -71,18 +71,14 @@ function App() {
 
       {/* Footer */}
       <footer className="py-8 text-center text-gray-600 text-sm">
-        <div className="flex items-center justify-center gap-2 mb-3">
-          <span className="text-xs text-gray-500">Deployed on</span>
+        <div className="flex items-center justify-center mb-3">
           <a
             href="https://akash.network"
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-1.5 px-3 py-1 bg-red-500/10 border border-red-500/20 rounded-full text-red-400 hover:bg-red-500/20 transition-colors"
+            className="inline-block hover:opacity-80 transition-opacity"
           >
-            <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
-            Akash Network
+            <img src="/powered-by-akash.svg" alt="Powered by Akash" className="h-6" />
           </a>
         </div>
         <p>
