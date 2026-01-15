@@ -15,7 +15,7 @@ A web app that generates savage (but clever) roasts of LinkedIn profiles using A
 
 ## Deploy on Akash
 
-[![Deploy on Akash](https://img.shields.io/badge/Deploy%20on-Akash-red?style=for-the-badge)](https://console.akash.network)
+[![Deploy on Akash](https://raw.githubusercontent.com/akash-network/console/refs/heads/main/apps/deploy-web/public/images/deploy-with-akash-btn.svg)](https://console.akash.network/new-deployment?repoUrl=https%3A%2F%2Fgithub.com%2Fbaktun14%2Flinkedin-roast&branch=master)
 
 1. Go to [Akash Console](https://console.akash.network)
 2. Click **"Build and Deploy"**
